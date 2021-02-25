@@ -49,29 +49,36 @@ public class BankUserDao {
 	public ArrayList<BankAccount> getAllUsers()
 	{
 		DBOpen();
+		
 		try {
-			preStmt = conn.prepareStatement("Select * from usersDB");
-			ResultSet result = preStmt.executeQuery();
-			BankAccount user = new BankAccount();
+		//	System.out.println("Get in here");
+			stmt = conn.createStatement();
+			
+			String sql = "Select * from usersDB";
+			ResultSet result = stmt.executeQuery(sql);
+			
 			while(result.next())
 			{
+				BankAccount user = new BankAccount();
 				user.setfName(result.getString("FirstName"));
 				user.setlName(result.getString("LastName"));
 				user.setAccNum(result.getInt("AccNum"));
 				user.setPhoneNumber(result.getLong("PhoneNumber"));
 				user.setEmail(result.getString("email"));
 				user.setBalance(result.getDouble("Balance"));
+				listUser.add(user);
 				
 			}
 			
-			
+		
 			conn.close();
 			return listUser;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			System.out.println("My Error");
 		}
-		return null;
+		return listUser;
 		
 	
 	}
@@ -134,6 +141,7 @@ public class BankUserDao {
 	public void addUser(BankAccount user)
 	{
 	
+		System.out.println(user.getfName());
 		listUser.add(user);
 		
 	}
@@ -160,6 +168,10 @@ public class BankUserDao {
 				preStmt.executeUpdate();
 				System.out.println("Entered into database:"+user.getfName());
 				
+			}
+			else
+			{
+				updateUser(user);
 			}
 			
 			conn.close();
@@ -205,18 +217,14 @@ public class BankUserDao {
 					updateUser(user);
 				}
 			
+				conn.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			finally
 			{
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				
 			}
 		}
 		
@@ -400,5 +408,15 @@ public class BankUserDao {
 		listUser.add(user);
 		
 		return listUser;
+	}
+	
+	
+	public void Test3(BankAccount user)
+	{
+		listUser.add(user);
+		System.out.println(user.getfName());
+		
+		
+	
 	}
 }
