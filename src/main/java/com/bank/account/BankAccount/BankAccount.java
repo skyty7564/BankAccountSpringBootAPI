@@ -1,10 +1,31 @@
 package com.bank.account.BankAccount;
 
-import org.springframework.stereotype.Component;
 
-@Component
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+
+
+
+
 public class BankAccount {
 	
+	public BankAccount(int accNum, double amount) {
+		super();
+		this.accNum = accNum;
+		this.amount = amount;
+	}
+
+	public BankAccount(String email, long phoneNumber) {
+		super();
+		this.email = email;
+		this.phoneNumber = phoneNumber;
+	}
+
+	protected BankAccount() {}
+
 	public BankAccount(int accNum, String fName, String lName) {
 		super();
 		this.accNum = accNum;
@@ -12,10 +33,6 @@ public class BankAccount {
 		this.lName = lName;
 	}
 
-
-	public BankAccount()
-	{}
-	
 
 
 	public BankAccount(int accNum, double balance, String fName, String lName, String email, long phoneNumber) {
@@ -29,12 +46,25 @@ public class BankAccount {
 		
 
 	}
+
 	private int accNum;
+	
+
 	private double balance;
+	
+
 	private String fName;
+	
+
 	private String lName;
+	
+
 	private String email;
+	
+	private double amount;
+	
 	private long phoneNumber;
+	
 	public int getAccNum() {
 		return accNum;
 	}
@@ -99,6 +129,14 @@ public class BankAccount {
 		{
 			return true;
 		}
+	}
+
+	public double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(double amount) {
+		this.amount = amount;
 	}
 
 	

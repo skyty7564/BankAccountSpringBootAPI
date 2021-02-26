@@ -17,7 +17,7 @@ import java.sql.Statement;
 public class BankUserDao {
 	
 	private final static String JDBC_DRIVER =  "com.mysql.cj.jdbc.Driver";
-	private final static String DB_URL ="jdbc:mysql://bankapp.cbyib0kp0daq.us-east-2.rds.amazonaws.com/BankDemo";
+	private final static String DB_URL ="jdbc:mysql://bankapp.cmzwk8z05jtw.us-east-2.rds.amazonaws.com/BankDemo";
 	private final static String USER = "Admin";
 	private final static String PASSWORD = "Password";
 	private static Connection conn = null;
@@ -54,7 +54,7 @@ public class BankUserDao {
 		//	System.out.println("Get in here");
 			stmt = conn.createStatement();
 			
-			String sql = "Select * from usersDB";
+			String sql = "Select * from usersdb";
 			ResultSet result = stmt.executeQuery(sql);
 			
 			while(result.next())
@@ -87,7 +87,7 @@ public class BankUserDao {
 	{
 		DBOpen();
 		try {
-			preStmt = conn.prepareStatement("Select * from usersDB Where AccNum = ?");
+			preStmt = conn.prepareStatement("Select * from usersdb Where AccNum = ?");
 			preStmt.setInt(1, Acc);
 			ResultSet result = preStmt.executeQuery();
 			BankAccount user = new BankAccount();
@@ -117,7 +117,7 @@ public class BankUserDao {
 	{
 		DBOpen();
 		try {
-			preStmt = conn.prepareStatement("Select 1 from usersDB Where AccNum = ?");
+			preStmt = conn.prepareStatement("Select 1 from usersdb Where AccNum = ?");
 			preStmt.setInt(1, Acc.getAccNum());
 			ResultSet result = preStmt.executeQuery();
 			
@@ -156,7 +156,7 @@ public class BankUserDao {
 			
 			if(!userExist)
 			{
-				preStmt = conn.prepareStatement("INSERT INTO usersDB (AccNum,FirstName,LastName,Balance,email,PhoneNumber) Values (?,?,?,?,?,?)");
+				preStmt = conn.prepareStatement("INSERT INTO usersdb (AccNum,FirstName,LastName,Balance,email,PhoneNumber) Values (?,?,?,?,?,?)");
 				
 				preStmt.setInt(1, user.getAccNum());
 				preStmt.setString(2, user.getfName());
@@ -199,7 +199,7 @@ public class BankUserDao {
 				
 				if(!userExist)
 				{
-					preStmt = conn.prepareStatement("INSERT INTO usersDB (AccNum,FirstName,LastName,Balance,email,PhoneNumber) Values (?,?,?,?,?,?)");
+					preStmt = conn.prepareStatement("INSERT INTO usersdb (AccNum,FirstName,LastName,Balance,email,PhoneNumber) Values (?,?,?,?,?,?)");
 					
 					preStmt.setInt(1, user.getAccNum());
 					preStmt.setString(2, user.getfName());
@@ -232,22 +232,28 @@ public class BankUserDao {
 	}
 	
 	//display the current user info
-	public void depositFunds(BankAccount user, double amount)
+	public void depositFunds(BankAccount user)
 	{
 	
+	
 		double balance = user.getBalance();
+		double amount = user.getAmount();
 		user.setBalance(balance + amount);
-		displayFunds(user,"Fund deposited!");
+		
+		System.out.println(user.getAccNum() + ":" + user.getAmount() + ":"+ user.getBalance());
+		
 		DBOpen();
 		
 		try {
-			preStmt = conn.prepareStatement("Update usersDB Set Balance = value Where AccNum =  AccNum");
+			preStmt = conn.prepareStatement("Update usersdb Set Balance = ? Where AccNum = ?");
 			preStmt.setDouble(1,user.getBalance());
 			preStmt.setInt(2, user.getAccNum());
-			
+			displayFunds(user,"Fund deposited!");
+			preStmt.executeUpdate();
 			conn.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.out.println("Error Deposit");
 			e.printStackTrace();
 		}
 		
@@ -277,7 +283,7 @@ public class BankUserDao {
 		
 	}
 	
-	public void updateUser(BankAccount User)
+	public static void updateUser(BankAccount User)
 	{
 		DBOpen();
 		try
@@ -309,11 +315,14 @@ public class BankUserDao {
 		
 	}
 	//withdraw money
-	public void withdrawFunds(BankAccount user, double amount)
+	public void withdrawFunds(BankAccount user)
 	{
 
+		double amount = user.getAmount();
 		double balance = user.getBalance();
 		double tempValue = balance - amount;
+		
+		
 		
 		if (tempValue < 0)
 		{
@@ -322,13 +331,14 @@ public class BankUserDao {
 		else
 		{
 			user.setBalance(tempValue);
+			System.out.println(user.getAccNum() + ":" + user.getAmount());
 			displayFunds(user,"Fund Successfully Withdrawed!");
 			
 			try {
-				preStmt = conn.prepareStatement("Update usersDB Set Balance = value Where AccNum =  AccNum");
+				preStmt = conn.prepareStatement("Update usersdb Set Balance = ? Where AccNum =  ?");
 				preStmt.setDouble(1,user.getBalance());
 				preStmt.setInt(2, user.getAccNum());
-				
+				preStmt.executeUpdate();
 				conn.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -359,6 +369,31 @@ public class BankUserDao {
 		
 		}
 	
+	public void deleteUser(BankAccount user)
+	{
+		DBOpen();
+		try
+		{
+			boolean userExist = retrieveUser(user);
+			
+			if(!userExist)
+			{
+				preStmt = conn.prepareStatement("Delete From usersdb Where AccNum  = ?");
+				
+				preStmt.setInt(1, user.getAccNum());
+				
+				preStmt.executeUpdate();
+				System.out.println("Deleted user from database:"+user.getfName());
+				
+			}
+			
+			conn.close();
+		}
+		catch (Exception e)
+		{
+			
+		}	
+	}
 	
 	
 	//----------------------------------------------------------------
@@ -371,7 +406,7 @@ public class BankUserDao {
 		//	System.out.println("Get in here");
 			stmt = conn.createStatement();
 			
-			String sql = "Select * from usersDB";
+			String sql = "Select * from usersdb";
 			ResultSet result = stmt.executeQuery(sql);
 			
 			while(result.next())

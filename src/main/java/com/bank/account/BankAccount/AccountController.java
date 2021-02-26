@@ -1,5 +1,6 @@
 package com.bank.account.BankAccount;
 
+import java.awt.List;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,18 +17,16 @@ public class AccountController {
 
 	
 	@GetMapping ("/Test")
-	public ArrayList<String> Hello()
+	public int Hello()
 	{
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("Hello");
-		list.add("Hello");
-		list.add("Hello");
-		list.add("Hello");
+		int list = 1;
 		return list;
 	}
 	
 	
-
+//	@Autowired
+//	GetDataService fetchDataService;
+	
 	@Autowired
 	BankUserDao userList = new BankUserDao();
 	
@@ -37,6 +35,13 @@ public class AccountController {
 	{
 			return userList.getAllUsers();
 	}
+	
+//	@GetMapping(path = "GetUser")
+//	public ArrayList<BankAccount> getAllUser()
+	//{
+	//	return fetchDataService.findAll();
+		
+	//}
 	
 	@PutMapping("/AddUser")
 	public void addUser(@RequestBody BankAccount user)
@@ -50,34 +55,40 @@ public class AccountController {
 		userList.updateDatabase();
 	}
 
+	@PostMapping ("/DeleteUser")
+	public void deleteUser(@RequestBody BankAccount user)
+	{
+		userList.deleteUser(user);
+	}
+	
+	@PostMapping ("/Deposit")
+	public void deposit(@RequestBody BankAccount user)
+	{
+		BankAccount userEdit = BankUserDao.retrieveUser(user.getAccNum());
+		
+		userEdit.setAmount(user.getAmount());
+		
+		userList.depositFunds(userEdit);
+	}
+	
+	@PostMapping ("/Withdraw")
+	public void withdraw(@RequestBody BankAccount user)
+	{
+		userList.deleteUser(user);
+	}
+
+	@PostMapping("/UpdateUser")
+	public void updateUser(@RequestBody BankAccount user)
+	{
+		BankUserDao.updateUser(user);
+	}
 	@GetMapping("/displayUser/{AccNum}")
 	public BankAccount displayUser(@PathVariable("AccNum") int AccNum )
 	{
 		return BankUserDao.retrieveUser(AccNum);
 	}
 	//-------------------------------------------------------------------------
-	@GetMapping("/Get2")
-	public ArrayList<BankAccount> updateUser2()
-	{
-		 return userList.Test2();
-	} 
-	@PutMapping("/Get3")
-	public void updateUser3(@RequestBody BankAccount user)
-	{
-		BankAccount users = new BankAccount (2,1000,"john","william","mail.com",9999999);
-		  userList.Test3(user);
-	} 
-	@PostMapping("/Update")
-	public void update(BankAccount user1)
-	{
-		userList.Test2();
-	}
-	@PutMapping("/Put")
-	public void updateUser2(BankAccount user1)
-	{
-		userList.Test2();
-	}
-	//-------------------------------------------------------------------------
+
 	
 	
 }
